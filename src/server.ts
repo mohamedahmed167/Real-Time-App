@@ -4,6 +4,7 @@ import cors from "cors"
 import connectDB from "./config/db";
 import http from "http"
 import {Server} from "socket.io"
+import Authrouter  from "./routes/user.route";
 dotenv.config()
 const app =express()
 const server =http.createServer(app)
@@ -21,8 +22,9 @@ connectDB()
 
 
 // Middlewares
-app.use(express.json())
 app.use(cors())
+app.use(express.json())
+app.use("/api", Authrouter);
 
 
 
