@@ -50,7 +50,7 @@ const isMatch = await bcrypt.compare(password,user.password);
   );
 const userObject =user.toObject()
 delete (userObject as Partial <typeof userObject>).password
-res.status(200).json({ sucess:true  ,message:"successfully Login in Real time app" ,user:userObject})
+res.status(200).json({ sucess:true  ,message:"successfully Login in Real time app" ,user:userObject ,token:token })
   }catch(error){
     console.log("error in login", error)
     res.status(500).json({success:false, message:"error in login "})
