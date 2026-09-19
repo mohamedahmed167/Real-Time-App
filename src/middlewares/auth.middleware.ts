@@ -1,13 +1,16 @@
 import jwt from "jsonwebtoken"
 import UserModel from "../models/user.model"
 import { NextFunction, Request ,Response } from "express"
+import { Types } from "mongoose"
 
 
 export interface MyJWT {
   userId:string
 }
 export interface AuthRequest extends Request{
-user?:object
+user?:{
+  _id:Types.ObjectId
+}
 }
 
 export const auth =async(req:AuthRequest ,res:Response,next:NextFunction)=>{
@@ -22,7 +25,7 @@ export const auth =async(req:AuthRequest ,res:Response,next:NextFunction)=>{
     if(!user){
       return res.status(401).json({message:"User not Found"})
     }
-    req.user=user
+    req.user! =user
     next()
   }catch(error){
     console.log("error in middleware",error)
