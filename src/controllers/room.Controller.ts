@@ -1,6 +1,8 @@
 import RoomModel from "../models/room.model";
 import { Request ,Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import messageModel from "../models/message.model";
+import mongoose from "mongoose";
 export const createRoom = async (req: AuthRequest, res: Response) => {
   try {
     const { name, description, isPrivate } = req.body;
@@ -42,4 +44,26 @@ export const getRoomById =async(req:Request ,res:Response)=>{
   console.log(`error get room by id`, error);
   return res.status(500).json({ error: "error occurred while getting room by id" });
   }
+}
+
+
+export const getRoomMessage =async(req:Request ,res:Response)=>{
+try {
+    const {roomId}=req.params
+    const Query = req.query.limit as string
+    const limit = Number(Math.min(parseInt(Query) || 50, 100))
+    const skip=parseInt(req.query.skip as string) ||0
+    const message =await messageModel.find({room:new mongoose.Types.ObjectId(roomId as string)}).sort({createdAt:-1}).skip(skip)
+    .populate("user" ,"username displayName")
+    .lean()
+    res.json(message)
+} catch (error) {
+ if(error instanceof Error){
+   console.log("error in getRoom message", error);
+   res
+     .status(500)
+     .json({ message: "error in get rooms", error: error.message });
+ }
+
+}
 }

@@ -10,6 +10,11 @@ import UserModel from "./models/user.model";
 import { MyJWT } from "./middlewares/auth.middleware";
 import RoomModel from "./models/room.model";
 import messageModel from "./models/message.model";
+import RoomRouter from "./routes/room.routes"
+
+
+
+
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
@@ -28,7 +33,7 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 app.use("/api", Authrouter);
-
+app.use("/api",RoomRouter)
 app.get("/", (req, res) => {
   res.send("hello world");
 });
