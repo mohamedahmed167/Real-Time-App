@@ -26,9 +26,20 @@ try{
 const rooms =await RoomModel.find().populate('createdBy',"username displayName" ).sort({createdAt :-1}).lean()
 res.json(rooms)
 }catch(error){
-    console.log(`error creating room`, error);
+    console.log(`error getting rooms`, error);
     return res
       .status(500)
-      .json({ error: "error occurred while creating room" });
+      .json({ error: "error occurred while getting rooms" });
 }
+}
+
+export const getRoomById =async(req:Request ,res:Response)=>{
+  try{
+    const {id}=req.params
+    const room=await RoomModel.findById(id).populate("createdBy", "username displayName").lean()
+    res.json(room)
+  }catch(error){
+  console.log(`error get room by id`, error);
+  return res.status(500).json({ error: "error occurred while getting room by id" });
+  }
 }
