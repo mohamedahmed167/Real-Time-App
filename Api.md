@@ -5,6 +5,6 @@
 -POST /api/Rooms (Auth) - {name ,description?,isPrivate}
 
 
-
+ 
 ## socket.io الاتصال مع التوكين
 --join-room -{roomId}=> السيرفير هيرد   joined-Room {roomId}

@@ -41,6 +41,10 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 app.set("io", io);
+
+const onlineUser =new Set() // تخزين الاونلاين
+
+
 io.on("connection", (socket) => {
   const token = socket.handshake.query.token as string;
   if (!token) {
@@ -60,6 +64,9 @@ io.on("connection", (socket) => {
         socket.data.userId = user._id.toString();
         socket.data.user = user;
         console.log("user Connected " + user.username);
+        onlineUser.add(socket.data.userId)
+        io.emit("user-online",{userId:socket.data.userId ,username:user.username})
+
         socket.on("join-room", async (data) => {
           const roomId = data.roomId;
           if (!roomId) {
@@ -150,6 +157,10 @@ io.on("connection", (socket) => {
   }
 
   socket.on("disconnect", () => {
+    if(socket.data.userId){
+      onlineUser.delete(socket.data.userId);
+      io.emit("user-offline",{userId:socket.data.userId})
+    }
     console.log("user is disconnect  " + socket.id);
   });
 });
