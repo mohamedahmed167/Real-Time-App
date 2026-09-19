@@ -20,12 +20,13 @@ const roomSchema =new mongoose.Schema({
     type:Boolean,
     default:false
   },
-  members:{
+  members:[{
     type:mongoose.Schema.Types.ObjectId,
     ref:"user"
-  }
+  }],
 
 },{
   timestamps:true
 })
 const RoomModel =mongoose.model("room",roomSchema)
+export default RoomModel

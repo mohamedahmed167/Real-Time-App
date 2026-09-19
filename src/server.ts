@@ -8,6 +8,8 @@ import Authrouter from "./routes/user.route";
 import jwt from "jsonwebtoken";
 import UserModel from "./models/user.model";
 import { MyJWT } from "./middlewares/auth.middleware";
+import RoomModel from "./models/room.model";
+import messageModel from "./models/message.model";
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
@@ -43,14 +45,104 @@ io.on("connection", (socket) => {
   }
   try {
     const decoded = jwt.verify(token!, process.env.JWT__SECRET!) as MyJWT;
-    UserModel.findById(decoded.userId).then((user) => {
-      if (!user) {
-        socket.emit("error", " User Not found ");
+    UserModel.findById(decoded.userId)
+      .then((user) => {
+        if (!user) {
+          socket.emit("error", " User Not found ");
+          socket.disconnect();
+          return;
+        }
+        socket.data.userId = user._id.toString();
+        socket.data.user = user;
+        console.log("user Connected " + user.username);
+        socket.on("join-room", async (data) => {
+          const roomId = data.roomId;
+          if (!roomId) {
+            socket.emit("error", "Room ID is required to join room");
+            return;
+          }
+          if (!socket.data.userId) {
+            socket.emit(
+              "error",
+              "Authentication error : user not Authenticated",
+            );
+            return;
+          }
+          try {
+            const room = await RoomModel.findById(roomId);
+            if (!room) {
+              socket.emit("error", "Room not found");
+              return;
+            }
+            if (room.isPrivate) {
+              const isMember = room.members?.some(
+                (m) => m.toString() == socket.data.userId,
+              );
+              if (!isMember) {
+                socket.emit(
+                  "error",
+                  "Access denied you are not a members of this private room  ",
+                );
+                return;
+              }
+              await socket.join(roomId);
+              socket.emit("joined-room", { roomId });
+              console.log(
+                `User ${socket.data.user.username} joined in private room ${room.name}  `,
+              );
+              socket.emit("");
+            }
+          } catch (error) {
+            if (error instanceof Error) {
+              socket.emit(
+                "error",
+                "error occurred while joining room  " + error.message,
+              );
+            }
+          }
+        });
+        socket.on("send-message", async (data) => {
+          const { roomId, text } = data || {};
+          if (!roomId || !text?.trim()) {
+            socket.emit("error", "Room id and text are Required");
+            return;
+          }
+          if (!socket.data.userId) {
+            socket.emit(
+              "error",
+              "Authentication error :user not Authenticated",
+            );
+            return;
+          }
+          try {
+            const message = await messageModel.create({
+              room: roomId,
+              user: socket.data.userId,
+              text: text.trim(),
+            });
+            const populated = await messageModel
+              .findById(message._id)
+              .populate("user", "username displayName")
+              .lean();
+
+            io.to(roomId).emit("new-message", populated);
+          } catch (error) {
+            if (error instanceof Error) {
+              socket.emit("error", "error in send message", error.message);
+            }
+          }
+        });
+      })
+      .catch((error) => {
+        socket.emit("error", "Authentication error", error.message);
         socket.disconnect();
-        return;
-      }
-    });
-  } catch (error) {}
+      });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      socket.emit("error", "Authentication error", error.message);
+    }
+    socket.disconnect();
+  }
 
   socket.on("disconnect", () => {
     console.log("user is disconnect  " + socket.id);
