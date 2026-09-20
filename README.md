@@ -65,11 +65,11 @@ Client
   ▼                                  ▼
 Express.js                       Socket.IO
   │                                  │
-  ├── Routes                          ├── Authentication
+  ├── Routes                         ├── Authentication
   │                                  ├── Room Management
-  ├── Controllers                     ├── Messaging
+  ├── Controllers                    ├── Messaging
   │                                  ├── Typing Events
-  └── Error Handler                   └── Online Presence
+  └── Error Handler                  └── Online Presence
   │                                  │
   └───────────────┬──────────────────┘
                   ▼
@@ -186,18 +186,6 @@ GET  /api/rooms/:id
 GET  /api/rooms/:roomId/messages
 ```
 
-## ⚙️ Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection
-JWT__SECRET=your_jwt_secret
-```
-
-> Never commit your `.env` file to GitHub.
-
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
@@ -212,11 +200,7 @@ git clone <your-repository-url>
 npm install
 ```
 
-### 3. Configure environment variables
-
-Create the `.env` file and add the required variables.
-
-### 4. Start the development server
+### 3. Start the development server
 
 ```bash
 npm run dev
@@ -248,4 +232,4 @@ This project was built to practice and demonstrate:
 
 Computer Science Graduate | Junior MERN Stack Developer
 
-* GitHub: https://github.com/mohamedahmed167
+GitHub: https://github.com/mohamedahmed167
