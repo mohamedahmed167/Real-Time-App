@@ -2,7 +2,7 @@
 
 A real-time chat application built with **Node.js, Express, MongoDB, TypeScript, and Socket.IO**.
 
-Features
+##Features
 
 * User Registration & Login
 * JWT Authentication
