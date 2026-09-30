@@ -4,6 +4,8 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import messageModel from "../models/message.model";
 import mongoose from "mongoose";
 import { ApiError } from "../utils/ApiError";
+
+
 export const createRoom = async (req: AuthRequest, res: Response) => {
   try {
     const { name, description, isPrivate } = req.body;

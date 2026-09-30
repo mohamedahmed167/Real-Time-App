@@ -3,9 +3,7 @@ import bcrypt from "bcrypt";
 import { Response, Request } from "express";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError";
-
-
-
+import { AuthRequest } from "../middlewares/auth.middleware";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -49,7 +47,7 @@ export const register = async (req: Request, res: Response) => {
   } catch (error) {
     console.log("Registration error", error);
 
-    throw new ApiError(500, "Error in Registration ");
+    throw error
   }
 };
 
@@ -98,6 +96,21 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log("error in login", error);
-        throw new ApiError(500, "error in Login");
+        throw error
   }
 };
+
+export const getCurrnetUser =async(req:AuthRequest ,res:Response)=>{
+  try{
+    const user = await UserModel.findById(req.user?._id).select("-password");
+    if(!user){
+      throw new ApiError(404,"User not found")
+    }
+    res.status(200).json({message:"get user success",user})
+
+  }catch(error){
+    console.log("error in get user",error)
+    throw error
+
+  }
+}
